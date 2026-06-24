@@ -19,7 +19,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const { topic, platform, tone, excludeHooks } = req.body;
+    const { topic, platform, tone, excludeHooks, model } = req.body;
     
     // Retrieve API key securely from Vercel Serverless Environment
     const apiKey = process.env.GEMINI_API_KEY;
@@ -30,6 +30,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
+    const selectedModel = model || 'gemini-2.5-flash';
     const formattedTopic = topic ? String(topic).trim() : "content creation";
     const promptText = `You are an expert short-form viral scriptwriter specialized in hooks for ${platform}.
 Generate exactly 3 hook concepts for a video about "${formattedTopic}" with a "${tone}" tone.
@@ -49,7 +50,7 @@ You MUST return your response as a valid JSON object matching this exact structu
 }
 Return only JSON. Do not include markdown wraps like \`\`\`json.`;
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

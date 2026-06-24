@@ -75,6 +75,7 @@ function App() {
   // API Config settings
   const [isLiveMode, setIsLiveMode] = useState(() => sessionStorage.getItem('hc_live_mode') === 'true')
   const [apiKey, setApiKey] = useState(() => sessionStorage.getItem('hc_api_key') || '')
+  const [selectedModel, setSelectedModel] = useState(() => sessionStorage.getItem('hc_selected_model') || 'gemini-3.1-flash-lite')
   const [showSettings, setShowSettings] = useState(false)
   const [showApiKey, setShowApiKey] = useState(false)
 
@@ -82,7 +83,8 @@ function App() {
   useEffect(() => {
     sessionStorage.setItem('hc_live_mode', String(isLiveMode))
     sessionStorage.setItem('hc_api_key', apiKey)
-  }, [isLiveMode, apiKey])
+    sessionStorage.setItem('hc_selected_model', selectedModel)
+  }, [isLiveMode, apiKey, selectedModel])
 
   // Auto-generate some default hooks on mount so dashboard isn't completely empty initially
   useEffect(() => {
@@ -107,7 +109,7 @@ function App() {
     try {
       let results;
       if (isLiveMode && apiKey.trim()) {
-        results = await generateLiveHooks(topic, platform, tone, apiKey)
+        results = await generateLiveHooks(topic, platform, tone, apiKey, undefined, selectedModel)
       } else {
         results = await generateMockHooks(topic, platform, tone)
       }
@@ -126,7 +128,7 @@ function App() {
       const currentHookTexts = hooks.map(h => h.hook)
       let results;
       if (isLiveMode && apiKey.trim()) {
-        results = await generateLiveHooks(topic, platform, tone, apiKey, currentHookTexts)
+        results = await generateLiveHooks(topic, platform, tone, apiKey, currentHookTexts, selectedModel)
       } else {
         results = await generateMockHooks(topic, platform, tone, currentHookTexts)
       }
@@ -240,7 +242,7 @@ function App() {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Toggle Switch */}
               <div className="space-y-2">
                 <span className="block text-xs font-semibold uppercase tracking-wider text-gray-400">
@@ -249,10 +251,10 @@ function App() {
                 <div className="flex items-center justify-between p-3.5 bg-[#0B0F19]/60 border border-gray-800 rounded-xl">
                   <div className="pr-4">
                     <p className="text-xs font-bold text-gray-200">
-                      {isLiveMode ? 'Live AI Mode (Gemini)' : 'Offline Demo Mode'}
+                      {isLiveMode ? 'Live AI Mode' : 'Offline Demo'}
                     </p>
                     <p className="text-[10px] text-gray-500 mt-0.5">
-                      {isLiveMode ? 'Fetches real-time hooks from Gemini LLM' : 'Uses highly optimized mock presets'}
+                      {isLiveMode ? 'Fetches from LLM' : 'Uses mock presets'}
                     </p>
                   </div>
                   <button
@@ -269,6 +271,30 @@ function App() {
                     />
                   </button>
                 </div>
+              </div>
+
+              {/* Gemini Model Selection */}
+              <div className="space-y-2">
+                <span className="block text-xs font-semibold uppercase tracking-wider text-gray-400">
+                  Gemini Model
+                </span>
+                <div className="relative">
+                  <select
+                    value={selectedModel}
+                    onChange={(e) => setSelectedModel(e.target.value)}
+                    className="w-full px-4 py-3 bg-[#0B0F19]/60 border border-gray-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl text-xs text-gray-200 outline-none cursor-pointer appearance-none"
+                  >
+                    <option value="gemini-3.1-flash-lite">Gemini 3.1 Flash Lite (High Quota)</option>
+                    <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+                    <option value="gemini-3.5-flash">Gemini 3.5 Flash</option>
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
+                    <Video className="w-3.5 h-3.5" />
+                  </div>
+                </div>
+                <p className="text-[9px] text-gray-500">
+                  Switch to Lite models if your keys hit daily request limit blocks.
+                </p>
               </div>
 
               {/* API Key Input */}
@@ -295,7 +321,7 @@ function App() {
                   </button>
                 </div>
                 <p className="text-[9px] text-gray-500">
-                  Keys are stored locally in your browser's session storage and never shared. Get one from Google AI Studio.
+                  Keys are stored in your browser session storage. Get one from Google AI Studio.
                 </p>
               </div>
             </div>

@@ -175,10 +175,12 @@ export async function generateLiveHooks(
   platform: string,
   tone: string,
   apiKey?: string,
-  excludeHooks?: string[]
+  excludeHooks?: string[],
+  model?: string
 ): Promise<HookResult[]> {
   try {
     const formattedTopic = topic.trim() || "content creation";
+    const selectedModel = model || 'gemini-2.5-flash';
 
     if (apiKey && apiKey.trim()) {
       // Front-end direct call option (if developer pastes custom key in Settings Panel)
@@ -200,7 +202,7 @@ You MUST return your response as a valid JSON object matching this exact structu
 }
 Return only JSON. Do not include markdown wraps like \`\`\`json.`;
 
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -242,7 +244,8 @@ Return only JSON. Do not include markdown wraps like \`\`\`json.`;
           topic: formattedTopic,
           platform,
           tone,
-          excludeHooks
+          excludeHooks,
+          model: selectedModel
         })
       });
 
