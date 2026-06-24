@@ -258,10 +258,6 @@ function App() {
                   <button
                     type="button"
                     onClick={() => {
-                      if (!apiKey.trim() && !isLiveMode) {
-                        alert("Please paste a Gemini API Key to enable Live Mode!");
-                        return;
-                      }
                       setIsLiveMode(!isLiveMode);
                     }}
                     className="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:ring-offset-0 bg-gray-800"
@@ -286,7 +282,6 @@ function App() {
                     value={apiKey}
                     onChange={(e) => {
                       setApiKey(e.target.value);
-                      if (!e.target.value.trim()) setIsLiveMode(false);
                     }}
                     placeholder="Enter AIzaSy... API key"
                     className="w-full pl-4 pr-10 py-3 bg-[#0B0F19]/60 border border-gray-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl text-xs text-gray-200 placeholder-gray-600 outline-none"
