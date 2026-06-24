@@ -108,7 +108,7 @@ function App() {
     setIsGenerating(true)
     try {
       let results;
-      if (isLiveMode && apiKey.trim()) {
+      if (isLiveMode) {
         results = await generateLiveHooks(topic, platform, tone, apiKey, undefined, selectedModel)
       } else {
         results = await generateMockHooks(topic, platform, tone)
@@ -127,7 +127,7 @@ function App() {
     try {
       const currentHookTexts = hooks.map(h => h.hook)
       let results;
-      if (isLiveMode && apiKey.trim()) {
+      if (isLiveMode) {
         results = await generateLiveHooks(topic, platform, tone, apiKey, currentHookTexts, selectedModel)
       } else {
         results = await generateMockHooks(topic, platform, tone, currentHookTexts)

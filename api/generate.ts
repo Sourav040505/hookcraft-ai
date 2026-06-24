@@ -73,9 +73,14 @@ Return only JSON. Do not include markdown wraps like \`\`\`json.`;
     }
 
     const data = await response.json();
-    const cleanText = data.candidates[0].content.parts[0].text.trim();
+    let cleanText = data.candidates[0].content.parts[0].text.trim();
+    
+    // Remove markdown code block wraps (e.g., ```json ... ```) if Gemini returns them
+    if (cleanText.startsWith('```')) {
+      cleanText = cleanText.replace(/^```(?:json)?\s*/, '').replace(/\s*```$/, '').trim();
+    }
+    
     const parsed = JSON.parse(cleanText);
-
     return res.status(200).json(parsed);
   } catch (error: any) {
     console.error("Serverless API generation failed:", error);
